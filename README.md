@@ -17,4 +17,3 @@ TinyML has rose to popularity in an era where data is everywhere. However, the d
   * graphing.ipynb has the information to graph our figures from the paper from the .csv files
 * tensorflow (no changes)
 * third_party (no changes)
-# TinyFederatedTransforLearning
