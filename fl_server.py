@@ -21,7 +21,7 @@ np.random.seed(4321)
 
 samples_per_device = 120 # Amount of samples of each word to send to each device
 batch_size = 20 # Must be even, hsa to be split into 2 types of samples
-experiment = None # 'iid', 'no-iid', 'train-test', None
+experiment = 'train-test' # 'iid', 'no-iid', 'train-test', None
 use_threads = True
 
 output_amount = 4
@@ -35,14 +35,14 @@ momentum = 0.9
 learningRate= 0.01
 pauseListen = False # So there are no threads reading the serial input at the same time
 
-one_files = [file for file in os.listdir("datasets_mine/train_json_one") if file.startswith("one")]
-two_files = [file for file in os.listdir("datasets_mine/train_json_one") if file.startswith("two")]
-three_files = [file for file in os.listdir("datasets_mine/train_json_one") if file.startswith("three")]
-# unknown_files = [file for file in os.listdir("datasets_mine/train_json_one") if file.startswith("unknown")]
-test_one_files = [file for file in os.listdir("datasets_mine/test_json_one") if file.startswith("one")]
-test_two_files = [file for file in os.listdir("datasets_mine/test_json_one") if file.startswith("two")]
-test_three_files = [file for file in os.listdir("datasets_mine/test_json_one") if file.startswith("three")]
-# test_unknown_files = [file for file in os.listdir("datasets_mine/test_json_one") if file.startswith("unknown")]
+one_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("one")]
+two_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("two")]
+three_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("three")]
+# unknown_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("unknown")]
+test_one_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("one")]
+test_two_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("two")]
+test_three_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("three")]
+# test_unknown_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("unknown")]
 
 random.shuffle(one_files)
 random.shuffle(two_files)
@@ -108,7 +108,7 @@ def sendSamplesIID(device, deviceIndex, batch_size, batch_index):
 
 
         print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-        sendSample(device, 'datasets_mine/train_json_one/'+filename, num_button, deviceIndex)
+        sendSample(device, 'datasets/train_json_one/'+filename, num_button, deviceIndex)
 
 def sendSamplesNonIID(device, deviceIndex, batch_size, batch_index):
     global one_files, two_files, three_files, four_files, five_files, six_files, samples_per_device
@@ -131,7 +131,7 @@ def sendSamplesNonIID(device, deviceIndex, batch_size, batch_index):
 
         for i, filename in enumerate(files):
             print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-            sendSample(device, f"datasets_mine/{dir}/{filename}", num_button, deviceIndex)
+            sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
 
     if (samples_per_device <= 40):
         if (deviceIndex == 0):
@@ -147,7 +147,7 @@ def sendSamplesNonIID(device, deviceIndex, batch_size, batch_index):
 
         for i, filename in enumerate(files):
             print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-            sendSample(device, f"datasets_mine/{dir}/{filename}", num_button, deviceIndex)
+            sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
 
     if (samples_per_device <= 60):
         if (deviceIndex == 0):
@@ -163,7 +163,7 @@ def sendSamplesNonIID(device, deviceIndex, batch_size, batch_index):
 
         for i, filename in enumerate(files):
             print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-            sendSample(device, f"datasets_mine/{dir}/{filename}", num_button, deviceIndex)
+            sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
 
 def sendSample(device, samplePath, num_button, deviceIndex, only_forward = False):
     with open(samplePath) as f:
@@ -216,7 +216,7 @@ def sendTestSamples(device, deviceIndex, successes_queue):
         else:
             num_button = 0
 
-        error, success = sendSample(device, 'datasets_mine/test_json_one/'+filename, num_button, deviceIndex, True)
+        error, success = sendSample(device, 'datasets/test_json_one/'+filename, num_button, deviceIndex, True)
         tmp_acc.append(success)
         successes_queue.put(success)
         accuracy.append([sum(tmp_acc)/len(tmp_acc), deviceIndex])
