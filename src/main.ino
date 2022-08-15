@@ -22,7 +22,7 @@ static inference_t inference;
 static signed short sampleBuffer[2048];
 static bool debug_nn = false; // Set this to true to see e.g. features generated from the raw signal
 
-const uint8_t button_unknown = 1;
+// const uint8_t button_unknown = 1;
 const uint8_t button_1 = 2;
 const uint8_t button_2 = 3;
 const uint8_t button_3 = 4;

@@ -21,11 +21,11 @@ np.random.seed(4321)
 
 samples_per_device = 120 # Amount of samples of each word to send to each device
 batch_size = 20 # Must be even, hsa to be split into 2 types of samples
-experiment = 'train-test' # 'iid', 'no-iid', 'train-test', None
+experiment = 'no-iid' # 'iid', 'no-iid', 'train-test', None
 use_threads = True
 
 output_amount = 4
-test_samples_amount = 60
+test_samples_amount = 120
 size_hidden_nodes = 25
 size_hidden_layer = (650+1)*size_hidden_nodes
 size_output_layer = (size_hidden_nodes+1)*output_amount
@@ -35,20 +35,41 @@ momentum = 0.9
 learningRate= 0.01
 pauseListen = False # So there are no threads reading the serial input at the same time
 
-one_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("one")]
-two_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("two")]
-three_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("three")]
-# unknown_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("unknown")]
-test_one_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("one")]
-test_two_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("two")]
-test_three_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("three")]
-# test_unknown_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("unknown")]
+# one_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("one")]
+# two_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("two")]
+# three_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("three")]
+# # unknown_files = [file for file in os.listdir("datasets/train_json_one") if file.startswith("unknown")]
+# test_one_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("one")]
+# test_two_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("two")]
+# test_three_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("three")]
+# # test_unknown_files = [file for file in os.listdir("datasets/test_json_one") if file.startswith("unknown")]
 
+# random.shuffle(one_files)
+# random.shuffle(two_files)
+# random.shuffle(three_files)
+# # random.shuffle(unknown_files)
+
+# numbers = list(sum(zip(one_files, two_files, three_files), ()))
+# test_numbers = list(sum(zip(test_one_files, test_two_files, test_three_files), ()))
+
+cone_files = [file for file in os.listdir("datasets/Device_0/training") if file.startswith("open")]
+ctwo_files = [file for file in os.listdir("datasets/Device_0/training") if file.startswith("close")]
+cthree_files = [file for file in os.listdir("datasets/Device_0/training") if file.startswith("cold")]
+one_files = [file for file in os.listdir("datasets/Device_1/training") if file.startswith("open")]
+two_files = [file for file in os.listdir("datasets/Device_1/training") if file.startswith("close")]
+three_files = [file for file in os.listdir("datasets/Device_1/training") if file.startswith("cold")]
+test_one_files = [file for file in os.listdir("datasets/testing") if file.startswith("open")]
+test_two_files = [file for file in os.listdir("datasets/testing") if file.startswith("close")]
+test_three_files = [file for file in os.listdir("datasets/testing") if file.startswith("cold")]
+
+random.shuffle(cone_files)
+random.shuffle(ctwo_files)
+random.shuffle(cthree_files)
 random.shuffle(one_files)
 random.shuffle(two_files)
 random.shuffle(three_files)
-# random.shuffle(unknown_files)
 
+cnumbers = list(sum(zip(cone_files, ctwo_files, cthree_files), ()))
 numbers = list(sum(zip(one_files, two_files, three_files), ()))
 test_numbers = list(sum(zip(test_one_files, test_two_files, test_three_files), ()))
 
@@ -111,59 +132,99 @@ def sendSamplesIID(device, deviceIndex, batch_size, batch_index):
         sendSample(device, 'datasets/train_json_one/'+filename, num_button, deviceIndex)
 
 def sendSamplesNonIID(device, deviceIndex, batch_size, batch_index):
-    global one_files, two_files, three_files, four_files, five_files, six_files, samples_per_device
+    global cone_files, ctwo_files, cthree_files, one_files, two_files, three_files, samples_per_device
 
-    start = (batch_index * batch_size)
-    end = (batch_index * batch_size) + batch_size
+    # start = (batch_index * batch_size)
+    # end = (batch_index * batch_size) + batch_size
 
-    dir = 'datasets_mine/' # TMP fix
-    if (samples_per_device <= 20):
-        if (deviceIndex == 0):
-            files = three_files[start:end]
-            num_button = 3
-            dir = 'train_json_one'
-        elif  (deviceIndex == 1):
-            files = one_files[start:end]
-            num_button = 1
-            dir = 'train_json_one'
-        else:
-            exit("Exceeded device index")
+    dir = 'datasets/' # TMP fix
+    # if (samples_per_device <= 20):
+    #     if (deviceIndex == 0):
+    #         files = three_files[start:end]
+    #         num_button = 3
+    #         dir = 'train_json_one'
+    #     elif  (deviceIndex == 1):
+    #         files = one_files[start:end]
+    #         num_button = 1
+    #         dir = 'train_json_one'
+    #     else:
+    #         exit("Exceeded device index")
 
+    #     for i, filename in enumerate(files):
+    #         print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
+    #         sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+
+    # if (samples_per_device <= 40):
+    #     if (deviceIndex == 0):
+    #         files = two_files[start:end]
+    #         num_button = 2
+    #         dir = 'train_json_one'
+    #     elif  (deviceIndex == 1):
+    #         files = two_files[start:end]
+    #         num_button = 2
+    #         dir = 'train_json_one'
+    #     else:
+    #         exit("Exceeded device index")
+
+    #     for i, filename in enumerate(files):
+    #         print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
+    #         sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+
+    # if (samples_per_device <= 60):
+    #     if (deviceIndex == 0):
+    #         files = one_files[start:end]
+    #         num_button = 1
+    #         dir = 'train_json_one'
+    #     elif  (deviceIndex == 1):
+    #         files = three_files[start:end]
+    #         num_button = 3
+    #         dir = 'train_json_one'
+    #     else:
+    #         exit("Exceeded device index")
+
+    #     for i, filename in enumerate(files):
+    #         print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
+    #         sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+
+    start = (deviceIndex*samples_per_device) + (batch_index * batch_size)
+    end = (deviceIndex*samples_per_device) + (batch_index * batch_size) + batch_size
+
+    cfiles = cnumbers[start:end]
+    files = numbers[start:end]
+
+    if (deviceIndex == 0):
+        dir = 'Device_0/training'
+        for i, filename in enumerate(cfiles):
+            if (filename.startswith("open")):
+                num_button = 1
+                print(f"[{device.port}] Sending sample {filename} ({i}/{len(cfiles)}): Button {num_button}")
+                sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+            elif (filename.startswith("close")):
+                num_button = 2
+                print(f"[{device.port}] Sending sample {filename} ({i}/{len(cfiles)}): Button {num_button}")
+                sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+            elif (filename.startswith("cold")):
+                num_button = 3
+                print(f"[{device.port}] Sending sample {filename} ({i}/{len(cfiles)}): Button {num_button}")
+                sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+        dir = 'Device_0/training'
+    elif  (deviceIndex == 1):
+        dir = 'Device_1/training'
         for i, filename in enumerate(files):
-            print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-            sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
-
-    if (samples_per_device <= 40):
-        if (deviceIndex == 0):
-            files = two_files[start:end]
-            num_button = 2
-            dir = 'train_json_one'
-        elif  (deviceIndex == 1):
-            files = two_files[start:end]
-            num_button = 2
-            dir = 'train_json_one'
-        else:
-            exit("Exceeded device index")
-
-        for i, filename in enumerate(files):
-            print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-            sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
-
-    if (samples_per_device <= 60):
-        if (deviceIndex == 0):
-            files = one_files[start:end]
-            num_button = 1
-            dir = 'train_json_one'
-        elif  (deviceIndex == 1):
-            files = three_files[start:end]
-            num_button = 3
-            dir = 'train_json_one'
-        else:
-            exit("Exceeded device index")
-
-        for i, filename in enumerate(files):
-            print(f"[{device.port}] Sending sample {filename} ({i}/{len(files)}): Button {num_button}")
-            sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+            if (filename.startswith("open")):
+                num_button = 1
+                print(f"[{device.port}] Sending sample {filename} ({i}/{len(cfiles)}): Button {num_button}")
+                sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+            elif (filename.startswith("close")):
+                num_button = 2
+                print(f"[{device.port}] Sending sample {filename} ({i}/{len(cfiles)}): Button {num_button}")
+                sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+            elif (filename.startswith("cold")):
+                num_button = 3
+                print(f"[{device.port}] Sending sample {filename} ({i}/{len(cfiles)}): Button {num_button}")
+                sendSample(device, f"datasets/{dir}/{filename}", num_button, deviceIndex)
+    else:
+        exit("Exceeded device index")
 
 def sendSample(device, samplePath, num_button, deviceIndex, only_forward = False):
     with open(samplePath) as f:
@@ -206,17 +267,32 @@ def sendTestSamples(device, deviceIndex, successes_queue):
    
     files = test_numbers[start:end]
    
+    # for i, filename in enumerate(files):
+    #     if (filename.startswith("one")):
+    #         num_button = 1
+    #     elif (filename.startswith("two")):
+    #         num_button = 2
+    #     elif (filename.startswith("three")):
+    #         num_button = 3
+    #     else:
+    #         num_button = 0
+
+    #     error, success = sendSample(device, 'datasets/test_json_one/'+filename, num_button, deviceIndex, True)
+    #     tmp_acc.append(success)
+    #     successes_queue.put(success)
+    #     accuracy.append([sum(tmp_acc)/len(tmp_acc), deviceIndex])
+
     for i, filename in enumerate(files):
-        if (filename.startswith("one")):
+        if (filename.startswith("open")):
             num_button = 1
-        elif (filename.startswith("two")):
+        elif (filename.startswith("close")):
             num_button = 2
-        elif (filename.startswith("three")):
+        elif (filename.startswith("cold")):
             num_button = 3
         else:
             num_button = 0
 
-        error, success = sendSample(device, 'datasets/test_json_one/'+filename, num_button, deviceIndex, True)
+        error, success = sendSample(device, 'datasets/testing/'+filename, num_button, deviceIndex, True)
         tmp_acc.append(success)
         successes_queue.put(success)
         accuracy.append([sum(tmp_acc)/len(tmp_acc), deviceIndex])
@@ -527,14 +603,12 @@ for thread in threads: thread.join() # Wait for all the threads to end
 # startFL()
 
 test_result = []
-# for i in range(10):
 if experiment != None:
     train_ini_time = time.time()
 
     # Train the device
-    # for times in range(3):
     for batch in range(int(samples_per_device/batch_size)):
-        # for batch in range(4):
+    # for batch in range(6):  # no-iid
         batch_ini_time = time.time()
         for deviceIndex, device in enumerate(devices):
             if experiment == 'iid' or experiment == 'train-test':
@@ -555,7 +629,7 @@ if experiment != None:
         startFL()
         print(f'FL time: {time.time() - fl_ini_time} seconds)')
 
-        # samples_per_device += 20
+        # samples_per_device += 20  # no-iid
 
     train_time = time.time()-train_ini_time
         # print(f'Trained in ({train_time} seconds)')
